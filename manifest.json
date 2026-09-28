@@ -1,4 +1,21 @@
 {
   "format": 1,
-  "packs": {}
+  "packs": {
+    "hadith": {
+      "version": 1,
+      "url": "https://github.com/sala7alzhran/bayan-library/releases/download/hadith-1/hadith.db.gz",
+      "bytes": 9275592,
+      "sha256": "2a1942e4ee39a79bb596c508f0527130b3a02a93c1ff10ea6f82768d81a441c3",
+      "installedBytes": 37318656,
+      "count": 33370
+    },
+    "poetry": {
+      "version": 1,
+      "url": "https://github.com/sala7alzhran/bayan-library/releases/download/poetry-1/poetry.db.gz",
+      "bytes": 13882542,
+      "sha256": "521c9376d108916de57b834d81c21ce3f3da0c161c7c1e6ea21b472ab3bea633",
+      "installedBytes": 34619392,
+      "count": 146062
+    }
+  }
 }
