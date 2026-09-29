@@ -4,9 +4,9 @@
     "hadith": {
       "version": 2,
       "url": "https://github.com/sala7alzhran/bayan-library/releases/download/hadith-2/hadith.db.gz",
-      "bytes": 11577987,
-      "sha256": "b105e34624a35cd1a03dd0e667a93a8b974190a6708beea79df533f8ffd0447c",
-      "installedBytes": 41205760,
+      "bytes": 11578394,
+      "sha256": "ef75d5f84056846951c20e9be7e57c716ab211dfa56eef632f090a285b99d8fe",
+      "installedBytes": 41238528,
       "count": 33370
     },
     "poetry": {

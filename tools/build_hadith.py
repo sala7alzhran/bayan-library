@@ -202,9 +202,12 @@ def build(src, out, version):
             source TEXT NOT NULL, reference TEXT NOT NULL, grade TEXT NOT NULL, grader TEXT NOT NULL);
         CREATE VIRTUAL TABLE hadith_fts USING fts4(content="", body);
     ''')
-    lengths = bytearray([0])
+    # Kinds lift a hadith among equals: 2 al-Nawawi's Forty and the Hadith Qudsi, 1 al-Bukhari and Muslim.
+    lengths, kinds = bytearray([0]), bytearray([0])
     for i, key in enumerate(order, 1):
         lengths.append(min(255, len(key.split())))
+        first = rows[key]['refs'][0][2]
+        kinds.append(2 if first in ('الأربعون النووية', 'الأحاديث القدسية الأربعون') else 1 if first in ('صحيح البخاري', 'صحيح مسلم') else 0)
         r = rows[key]
         _, num, name = r['refs'][0]
         # As it is quoted: "رواه البخاري (1) ومسلم (1907)"; a collection's own numbering otherwise.
@@ -217,7 +220,7 @@ def build(src, out, version):
         db.execute('INSERT INTO hadith VALUES (?,?,?,?,?,?,?)',
                    (i, r['rank'], r['text'], f'{name} {num}', reference, r['grade'], r['grader']))
         db.execute('INSERT INTO hadith_fts(docid, body) VALUES (?, ?)', (i, index_text(key)))
-    db.execute('INSERT INTO docinfo VALUES (?, ?)', ('lengths', bytes(lengths)))
+    db.executemany('INSERT INTO docinfo VALUES (?, ?)', [('lengths', bytes(lengths)), ('kinds', bytes(kinds))])
     db.executemany('INSERT INTO meta VALUES (?, ?)', [
         ('kind', 'hadith'), ('version', version), ('count', str(len(order))),
         ('source', 'fawazahmed0/hadith-api (Unlicense)'),
