@@ -197,11 +197,14 @@ def build(src, out, version):
         PRAGMA page_size = 4096;
         PRAGMA journal_mode = DELETE;
         CREATE TABLE meta(key TEXT PRIMARY KEY, value TEXT NOT NULL);
+        CREATE TABLE docinfo(key TEXT PRIMARY KEY, data BLOB NOT NULL);
         CREATE TABLE hadith(id INTEGER PRIMARY KEY, rank INTEGER NOT NULL, text TEXT NOT NULL,
             source TEXT NOT NULL, reference TEXT NOT NULL, grade TEXT NOT NULL, grader TEXT NOT NULL);
         CREATE VIRTUAL TABLE hadith_fts USING fts4(content="", body);
     ''')
+    lengths = bytearray([0])
     for i, key in enumerate(order, 1):
+        lengths.append(min(255, len(key.split())))
         r = rows[key]
         _, num, name = r['refs'][0]
         # As it is quoted: "رواه البخاري (1) ومسلم (1907)"; a collection's own numbering otherwise.
@@ -214,6 +217,7 @@ def build(src, out, version):
         db.execute('INSERT INTO hadith VALUES (?,?,?,?,?,?,?)',
                    (i, r['rank'], r['text'], f'{name} {num}', reference, r['grade'], r['grader']))
         db.execute('INSERT INTO hadith_fts(docid, body) VALUES (?, ?)', (i, index_text(key)))
+    db.execute('INSERT INTO docinfo VALUES (?, ?)', ('lengths', bytes(lengths)))
     db.executemany('INSERT INTO meta VALUES (?, ?)', [
         ('kind', 'hadith'), ('version', version), ('count', str(len(order))),
         ('source', 'fawazahmed0/hadith-api (Unlicense)'),

@@ -35,13 +35,34 @@ def stems(word: str):
     return [w for w in dict.fromkeys(out) if w != word]
 
 
+_ISRI = None
+
+
+def root(word: str) -> str:
+    """The word's root by the ISRI stemmer (NLTK), run on the folded word; the keyboard runs the same algorithm
+    (com.nexakey.text.ArabicRoot) on what is typed."""
+    global _ISRI
+    if _ISRI is None:
+        from nltk.stem.isri import ISRIStemmer
+        _ISRI = ISRIStemmer()
+    return _ISRI.stem(word)
+
+
+ROOT_MARK = 'r'
+
+
 def index_text(folded: str) -> str:
-    """What the full-text index holds for a folded text: its words, then the bare forms of words with particles."""
+    """What the full-text index holds for a folded text: its words, the bare forms of words with particles, and
+    each word's root marked with "r" ("تبسمك" -> "rبسم"), so a search finds other forms of the same root."""
     words = folded.split()
     extra = []
     seen = set(words)
     for w in words:
-        for s in stems(w):
+        forms = stems(w)
+        r = root(w) if len(w) >= 3 else ''
+        if len(r) >= 2:
+            forms.append(ROOT_MARK + r)
+        for s in forms:
             if s not in seen:
                 seen.add(s)
                 extra.append(s)
